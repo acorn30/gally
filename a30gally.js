@@ -1,0 +1,177 @@
+/**
+* @file Library of functions for selecting and attributing images on a website.
+* @authour Elisha Sarkis
+*/
+// a30gally.js
+
+/*
+ * 2D Array for image attribution information 
+ * 0 : folder name (in images\ directory)
+ * 1 : total # of images in authour's folder
+ * 2 : url for authour site
+ * 3 : full professional name of authour
+ */
+var authourContent = [["none", 0, "#", "No Authours Added"]];
+var totalAuthours = 0; // the total number of authours in the array
+var defaultFileType = "jpg"; // the default file extension used for images
+// Array storing all instances of images with a non-default file extension
+var imageSpecialCases = [["none", -1, "No special file extension cases set."]]
+var totalSpecialCases = 0; // the total number of special case images in the array
+var parentDirectoryPath = "images"; // the parent directory/directories of the authour directories
+
+/**
+* Randomly select and assign an available background image, credit authour appropriately if desired.
+* @param {string} [elementId=""] - the optional id of HTML element to have it's href and inner HTML set to obtained attribution information
+*/
+function setBackgroundImage(elementId="") 
+{   
+    // Count total images available.
+    var totalImages = 0;
+    for(var i = 0; i < totalAuthours; i++)
+    {
+            totalImages += authourContent[i][1];
+    }
+
+    var numImageIdx = getRandomRangeInt(0, totalImages); // Randomly select an image index <= totalImages
+
+    // Determine authour and image number of random number within authour folders
+    var currImageIdx = 1; 
+    for(var i = 0; i < totalAuthours; i++)
+    {
+        for (var j = 1; j <= authourContent[i][1]; j++)
+        {
+            if (currImageIdx >= numImageIdx)
+            {
+                var authourNum = i; // array index of image's authour
+                var imageNum = j; // filename number of image
+                i = totalAuthours; // force exit of nested loop
+                break;
+            }
+            currImageIdx++;
+        }
+    }
+
+    // Attribution information
+    var authourFolder = authourContent[authourNum][0];  // directory/folder name containing authour's images
+    var authourURL =  authourContent[authourNum][2];    // the authour's website url
+    var authourName = authourContent[authourNum][3];    // authour's professional name
+    // Image information
+    var fileExt = checkForSpecialCase(authourFolder, imageNum); // the file extension of the image
+    var imageURL = 'url(' + parentDirectoryPath + '/' + authourFolder + '/' + imageNum + '.' + fileExt + ')';
+
+    // Set the background to the obtained image.
+    document.body.style.backgroundImage = imageURL;
+    // Set attribution text and link to credited authour's site, if desired
+    if (elementId != "")
+    {
+        credit = document.getElementById(elementId); // obtain the credit HTML element
+        credit.innerHTML = authourName; // set the inner HTML text of the element
+        credit.href = authourURL; // set the href value of the element
+    }
+}
+
+
+/**
+ * Adds an Authour to the attribution array, including provided details.
+ * @param {string} folderName - the case-sensitive name of the directory of the authour being added
+ * @param {integer} numImages - the total number of images in the authour's directory
+ * @param {string} website - the website to link to for this authour
+ * @param {string} fullAuthourName - the professional name of this authour
+ */
+function addAuthour(folderName, numImages, website, fullAuthourName)
+{
+    if (totalAuthours == 0) { authourContent.pop; }
+    authourContent.push([folderName, numImages, website, fullAuthourName]);
+    totalAuthours = authourContent.length; // Total number of authors in authorContent array
+}
+
+
+/**
+ * Adds a special case to the special case array, including provided details. Used for specifying the file extension of a sinlge image that does not use the set default file extension.
+ * @param {string} folderName - the case-sensitive name of the directory of the image
+ * @param {integer} imageNumber - the number of the image in the directory
+ * @param {string} fileExtension - the file extension to be used for this image, for example "png" or "jpg"
+ */
+function addImageSpecialCase(folderName, imageNumber, fileExtension)
+{
+    if (totalSpecialCases == 0) { imageSpecialCases.pop; }
+    imageSpecialCases.push([folderName, imageNumber, fileExtension]);
+    totalSpecialCases = imageSpecialCases.length;
+}
+
+
+/**
+ * Adds special cases to the special case array for an entire authour folder contents. Used for specifying the file extension of every image from a certain authour that does not use the set default file extension.
+ * @param {string} folderName - the case-sensitive name of the directory of the images
+ * @param {string} fileExtension - the file extension to be used for this image, for example "png" or "jpg"
+ */
+function addAuthourSpecialCase(folderName, fileExtension)
+{
+    if (totalSpecialCases == 0) { imageSpecialCases.pop; }
+    for (i = 0; i < authourContent.length; i++)
+    {
+        if (authourContent[i][0] == folderName)
+        {
+            // found our authour
+            for (var j = 1; j <= authourContent[i][1]; j++)
+            {
+                addImageSpecialCase(folderName, j, fileExtension)
+            }
+        }
+    }
+}
+
+
+/**
+ * Sets the default filetype to be used for any images that aren't a special case.
+ * @param {string} newType - the file extension to be set as default, for example "png" or "jpg"
+ */
+function setDefaultFileType(newType)
+{
+    defaultFileType = newType;
+}
+
+
+/**
+ * Sets the directory name or path to the directory containing the authour folders.
+ * @param {string} newPath - the path to directory containing the authout folders, for example "/images"
+ */
+function setParentDirectoryPath(newPath)
+{
+    parentDirectoryPath = newPath;
+}
+
+
+/**
+ * Checks if the image obtained by the folder and image number parameters has a special case attached.
+ * @param {string} folder - the directory containing the image in question
+ * @param {integer} imageNum - the number of the image in question in the directory
+ * @return {string} fileExt - the correct file extension for this image
+ */
+function checkForSpecialCase(folder, imageNum)
+{
+    if (totalSpecialCases > 0) // ensure there exists special cases at all
+    {
+        for (var i = 0; i < imageSpecialCases.length; i++)
+        {
+            if (imageSpecialCases[i][0] == folder && imageSpecialCases[i][1] == imageNum)
+            {
+                // found the image in the special cases array
+                return imageSpecialCases[i][2]; // return the correct file extension
+            }
+        }
+    }
+    return defaultFileType; // no special case for the image, return the default file extension
+}
+
+
+/**
+* Returns a random integer between minimum and maximum values inclusively.
+* @param {integer} min - the minimum random number returned possible
+* @param {integer} max - the maximim random number returned possible
+* @return {integer} resuly - a random integer between min and max inclusive
+*/
+function getRandomRangeInt(min, max) 
+{
+    return Math.round(Math.random() * (max - min) + min);
+}
