@@ -40,7 +40,7 @@ Simply obtain the gally.js file from this GitHub repository and add it the appro
 
 ## API Reference
 
-To be added to repository shortly.
+[View the documentation here.](https://rawgit.com/acorn30/gally/master/jsdoc/index.html)
 
 ## Tests
 
