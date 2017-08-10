@@ -44,7 +44,7 @@ Simply obtain the gally.js file from this GitHub repository and add it the appro
 
 ## Tests
 
-A detailed series of examples are available on the acorn30labs blog post for gally.js to be published shortly.
+[A detailed series of examples are available on the acorn30labs blog post for gally.js.](http://acorn30.com/dynamic-image-attribution-javascript/)
 
 ## Contributors
 
