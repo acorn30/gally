@@ -21,7 +21,7 @@ gally.js will target and hyperlink HTML elements specified by their id and set s
 
 By including the following in a `.html` file body:
 
-    <p>Background photo by: <a id="credit" class="active" href="#" >None</a>
+    Background photo by: <a id="credit" class="active" href="#" >None</a>
     <script type="text/javascript">
         addAuthour("hermes", 3, "http://hermes.example", "Hermes Conrad");
         addAuthour("hubert", 2, "http://hubert.example", "Hubert Farnsworth");
